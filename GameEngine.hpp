@@ -6,11 +6,11 @@
 
 using namespace std;
 
-void treeScorer(Board **fatherBoard, Stack **stackTop, short leafDepth);
-void SearchMinMax (Board **fatherBoard, Stack **stackTop);
+void treeScorer (Board **fatherBoard, Stack *stackTop);
+void SearchMinMax (Board **fatherBoard, Stack *stackTop);
 void updateBoard(Board **fatherBoard,  short column);
 bool verifyWinner(Board *boardElement, short playerID, std::string player);
-Board *selectPlay(Board **fatherBoard);
+Board *selectPlay(Stack *stackTop);
 void engineMain2(string player, short treeDepth);
 void engineMain1(string player, short treeDepth);
 

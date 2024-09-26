@@ -11,6 +11,7 @@ short collectInput(Board *boardElement, string playerName);
 void createSpace(short n);
 void ShowBoard(Board *boardElement);
 void showOutput(Board *boardElement);
+void wait();
 
 
 

@@ -8,62 +8,53 @@
 
 using namespace std;
 
-void treeScorer (Board **fatherBoard, Stack **stackTop, short leafDepth){
-    Board *popedBoard;
+void treeScorer (Board **fatherBoard, Stack *stackTop){
+
     int score1=0, score2=0;
-    char c;
- 
-    stackInit(fatherBoard, stackTop);
+    
 
-    while(!stackEmpty(*stackTop)){
-        popedBoard=stackPop(stackTop);
-        if (isLeafe(popedBoard)){
-            score1=(-1)*scoreBuilder(popedBoard,1,2);
-            score2=scoreBuilder(popedBoard,2,1);
-            popedBoard->boardScore=score1+score2;
-        }
+  while(stackTop!=NULL){
+       *fatherBoard=stackTop->board;
 
- /*      cout << "Tree Level " << popedBoard->level << endl;
-        cout << "Player ID " << popedBoard->playerID << endl;
-        cout << "Board Score " << popedBoard->boardScore << endl;
-        displayBoard(popedBoard);
-            cout << "Press any key to continue..." << endl;
-            cin >> c;*/
-        for (int k=0; k<N; k++){
-            if ((popedBoard)->childs[k]!=NULL){
-                stackPush(stackTop, (popedBoard)->childs[k]);
-            }
-        }
-    }      
+          if (isLeafe((*fatherBoard))){
+            score1=(-1)*scoreBuilder((*fatherBoard),1,2);
+            score2=scoreBuilder((*fatherBoard),2,1);
+            (*fatherBoard)->boardScore=score1+score2;  
+        }   
+        stackTop=stackTop->next;
+    } 
+   
 }
 
-void SearchMinMax (Board **fatherBoard, Stack **stackTop){
+void SearchMinMax (Board **fatherBoard, Stack *stackTop){
 
-    Board *popedBoard;
+
     int minScore=0;
     int maxScore=0;
-    
-    stackInit(fatherBoard, stackTop);
-    while(!stackEmpty(*stackTop)){
-        popedBoard=stackPop(stackTop);
-        minScore=popedBoard->boardScore+1;
-        maxScore=(-1)*(popedBoard->boardScore+1);
+    Board *treeNode=*fatherBoard;
+  
+    while(stackTop!=NULL){
+        treeNode=stackTop->board;
+        minScore=treeNode->boardScore+1;
+        maxScore=(-1)*(treeNode->boardScore+1);
+       
+       
         for (short k=0; k<N;k++){  
-            if ((popedBoard->childs[k]!=NULL)){
-                if ((popedBoard->childs[k]->boardScore!=pow(2,16))){
-                    if((popedBoard->level%2) && (popedBoard->childs[k]->boardScore < minScore)){
-                            minScore=popedBoard->childs[k]->boardScore; 
-                            popedBoard->boardScore=minScore;     
+            if ((treeNode->childs[k]!=NULL)){
+                if ((treeNode->childs[k]->boardScore!=pow(2,16))){
+                    if((treeNode->level%2) && (treeNode->childs[k]->boardScore < minScore)){
+                        minScore=treeNode->childs[k]->boardScore; 
+                        treeNode->boardScore=minScore;     
                 }   
-                if(!(popedBoard->level%2) && (popedBoard->childs[k]->boardScore > maxScore)){
-                        maxScore=popedBoard->childs[k]->boardScore; 
-                        popedBoard->boardScore=maxScore;
-                           
+                    if(!(treeNode->level%2) && (treeNode->childs[k]->boardScore > maxScore)){
+                        maxScore=treeNode->childs[k]->boardScore; 
+                        treeNode->boardScore=maxScore;           
                 }   
              }   
-                stackPush(stackTop,(popedBoard)->childs[k]);
+                
             }
         }            
+    stackTop=stackTop->next;
     }
 }
 
@@ -100,21 +91,24 @@ bool verifyWinner(Board *boardElement, short playerID, string player){
     return false;
 }
 
-Board *selectPlay(Board **fatherBoard){
+Board *selectPlay(Stack *stackTop){
 
     int maxScore=(-1)*pow(2,16);
     Board *selectedBoard;
+    Board *rootBoard=stackTop->board;
 
     for (short k=0; k<N; k++){
-        if ((*fatherBoard)->childs[k]!=NULL){
-            if ((*fatherBoard)->childs[k]->boardScore > maxScore){
-                maxScore=(*fatherBoard)->childs[k]->boardScore;
-                selectedBoard=(*fatherBoard)->childs[k];
+        if ((rootBoard)->childs[k]!=NULL){
+            if (rootBoard->childs[k]->boardScore > maxScore){
+                maxScore=(rootBoard)->childs[k]->boardScore;
+                selectedBoard=(rootBoard)->childs[k];
             } 
         }
     }
     return selectedBoard;
 }
+
+
 
 void engineMain1(string player, short treeDepth){
 
@@ -142,14 +136,14 @@ void engineMain1(string player, short treeDepth){
             break;
         }
         treeConstructor( &boardPtr2,&nodeStack, treeDepth);
-        treeScorer(&boardPtr2, &nodeStack, treeDepth );
+        treeScorer(&boardPtr2, nodeStack);
         for (short h=0; h<(treeDepth-1); h++){
-            SearchMinMax(&boardPtr2, &nodeStack);
+            SearchMinMax(&boardPtr2, nodeStack);
         }
-        boardPtr1=selectPlay(&boardPtr2);
+        boardPtr1=selectPlay(nodeStack);
         ShowBoard(boardPtr1);
         if (verifyWinner(boardPtr1, boardPtr1->playerID, player)){
-            deleteTree(&boardPtr2, &nodeStack);
+            deleteAll(&boardPtr2, &nodeStack);
             break;
         }
         gameBoard.boardScore=pow(2,16);
@@ -161,7 +155,7 @@ void engineMain1(string player, short treeDepth){
                 gameBoard.boardMatrix[l][c]=boardPtr1->boardMatrix[l][c];
             }
         } 
-        deleteTree(&boardPtr2, &nodeStack);
+        deleteAll(&boardPtr2, &nodeStack);
         boardPtr2=(Board *)malloc(sizeof(Board));
         boardPtr2->level=gameBoard.level;
         boardPtr2->playerID=gameBoard.playerID;
@@ -196,15 +190,16 @@ void engineMain2(string player, short treeDepth){
 
     while (!winner){
         treeConstructor( &boardPtr2,&nodeStack, treeDepth);
-        treeScorer(&boardPtr2, &nodeStack, treeDepth );
+        treeScorer(&boardPtr2, nodeStack);
         for (short h=0; h<(treeDepth-1); h++){
-            SearchMinMax(&boardPtr2, &nodeStack);
+            SearchMinMax(&boardPtr2, nodeStack);
         }
-        boardPtr1=selectPlay(&boardPtr2);
+        boardPtr1=selectPlay(nodeStack);
         ShowBoard(boardPtr1);
         if (verifyWinner(boardPtr1, boardPtr1->playerID, player)){
-            deleteTree(&boardPtr2, &nodeStack);
+            deleteAll(&boardPtr2,&nodeStack);
             break;
+            
         }
         gameBoard.boardScore=pow(2,16);
         gameBoard.level=0;
@@ -215,7 +210,7 @@ void engineMain2(string player, short treeDepth){
                 gameBoard.boardMatrix[l][c]=boardPtr1->boardMatrix[l][c];
             }
         }
-        deleteTree(&boardPtr2, &nodeStack);
+        deleteAll(&boardPtr2, &nodeStack);
         boardPtr2=(Board *)malloc(sizeof(Board));
         boardPtr2->level=gameBoard.level;
         boardPtr2->playerID=gameBoard.playerID;
@@ -234,3 +229,4 @@ void engineMain2(string player, short treeDepth){
         }    
     }
 }
+
