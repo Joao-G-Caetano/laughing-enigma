@@ -7,10 +7,10 @@
 
 void basicContructor(Board **fatherBoard, long *nChilds);
 void treeConstructor(Board **fatherBoard, Stack **stackTop, short treeDepth);
-void treePrinter(Board **fatherBoard, Stack **stackTop, short treeDepth);
+void treePrinter(Stack *stackTop, short treeDepth);
 short isLeafe(Board *element);
-void levelPrinter(Board **fatherBoard, Stack **stackTop, short treeDepth);
-void deleteTree(Board **fatherBoard, Stack **stackTop);
+void levelPrinter(Stack *stackTop, short treeDepth);
+void deleteAll(Board **fatherBoard, Stack **stackTop);
 
 
 

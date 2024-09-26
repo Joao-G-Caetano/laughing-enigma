@@ -57,86 +57,112 @@ void basicContructor(Board **fatherBoard, long *nChilds){
 
 void treeConstructor(Board **fatherBoard, Stack **stackTop, short treeDepth){
 
+
     Board *popedBoard;
     long remainingChilds=0;
+    Stack *stackHead=(Stack*) malloc(sizeof(Stack));
+    Stack *newElement;
+    Stack *stackTailHead;
+    Stack *stackTailTop;
+    Stack *auxStack;
+    Stack **stackInit;
+    char c;
 
     for (short k=1; k<=treeDepth; k++){
       remainingChilds+= pow(N,k);  
     }   
-    stackInit(fatherBoard, stackTop);
-    while(!stackEmpty(*stackTop)){
-        popedBoard=stackPop(stackTop); 
+    
+    /*queueInit*/
+    stackHead->board=*fatherBoard;
+    stackHead->next=NULL;
+
+    (*stackTop)=stackHead;
+
+    while(stackHead!=NULL){
+        /*queuePop*/
+        popedBoard=(stackHead)->board;
+        stackHead=stackHead->next;
+
+
+        /*child generation*/
         if ((remainingChilds > 0) && (isLeafe(popedBoard)) && (popedBoard->level < treeDepth)){
             basicContructor(&popedBoard, &remainingChilds);            
         }
-        if (remainingChilds <= 0){
-            stackFlush(stackTop);
-            break;
-        }
+        /*queuePush*/
         for (int k=0; k<N; k++){
             if ((popedBoard)->childs[k]!=NULL){
-                stackPush(stackTop, (popedBoard)->childs[k]);                   
+                Stack *newElement= (Stack*) malloc(sizeof(Stack));
+                newElement->board=(popedBoard)->childs[k];
+                newElement->next=NULL;
+                stackTailHead=stackHead;
+                stackTailTop=(*stackTop);
+                 if (stackHead==NULL){
+                    stackHead=newElement;
+                    stackHead->next=NULL; 
+                    (*stackTop)->next=newElement;
+                    continue;
+                 }
+                 while(stackTailHead->next!=NULL){
+                    stackTailHead=stackTailHead->next;
+                 }
+                 while(stackTailTop->next!=NULL){
+                    stackTailTop=stackTailTop->next;
+                 }
+                 
+                stackTailHead->next=newElement;
+                stackTailTop->next=newElement;
+
             }
+
         }
+
     }
 }
     
-void treePrinter(Board **fatherBoard, Stack **stackTop, short treeDepth){
+void treePrinter(Stack *stackTop, short treeDepth){
     Board *popedBoard;
     char c;
  
-    stackInit(fatherBoard, stackTop);
-    while(!stackEmpty(*stackTop)){
-        popedBoard=stackPop(stackTop);
-        if (popedBoard->level > treeDepth){
+
+    while(stackTop!=NULL){
+        popedBoard=stackTop->board;
+        if ((popedBoard->level) > treeDepth){
             break;
         }
         displayBoard(popedBoard);
-            cout << "Press any key to continue..." << endl;
-            cin >> c;
-        for (int k=0; k<N; k++){
-            if ((popedBoard)->childs[k]!=NULL){
-                stackPush(stackTop, (popedBoard)->childs[k]);
-            }
-        }
+        cout << "Press any key to continue..." << endl;
+        cin >> c;
+        stackTop=stackTop->next;
     }      
 }
 
-void levelPrinter(Board **fatherBoard, Stack **stackTop, short treeDepth){
+void levelPrinter(Stack *stackTop, short treeDepth){
     
     Board *popedBoard;
     char c;
- 
-    stackInit(fatherBoard, stackTop);
-    while(!stackEmpty(*stackTop)){
-        popedBoard=stackPop(stackTop);
-        if (popedBoard->level == treeDepth){
+     
+     while(stackTop!=NULL){
+        popedBoard=stackTop->board;
+        if ((popedBoard->level) == treeDepth){
             displayBoard(popedBoard);
             cout << "Press any key to continue..." << endl;
-            cin >> c;
-        }   
-        for (int k=0; k<N; k++){
-            if ((popedBoard)->childs[k]!=NULL){
-                stackPush(stackTop, (popedBoard)->childs[k]);
-            }
+            cin >> c;  
         }
-    }      
+        stackTop=stackTop->next;
+    } 
 }
 
-void deleteTree(Board **fatherBoard, Stack **stackTop){
+void deleteAll(Board **fatherBoard, Stack **stackTop){
 
-    Board *popedBoard;
+    Stack *aux;
     
-    stackInit(fatherBoard, stackTop);
-    while(!stackEmpty(*stackTop)){
-        popedBoard=stackPop(stackTop);
-        for (int k=0; k<N; k++){
-            if ((popedBoard)->childs[k]!=NULL){
-                stackPush(stackTop, (popedBoard)->childs[k]);
-            }
-        }
-        free(popedBoard);
-    }      
+     while((*stackTop)!=NULL){
+        (*fatherBoard)=(*stackTop)->board;
+        free(*fatherBoard);
+        aux=(*stackTop);
+        *stackTop=(*stackTop)->next;
+        free(aux);
+    } 
 }
 
 

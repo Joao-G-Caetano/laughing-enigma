@@ -106,7 +106,7 @@ void startGame(short *treeDepth, string *playerName, short *starter){
 }
 
 
-/*mostra o tabuleiro APOS a jogada do comp. pede input ao user*/
+
 short collectInput(Board *boardElement, string playerName){
 
     short columnNumber=-1;
@@ -163,5 +163,12 @@ void showUserMove(Board *boardElement){
 
 }
 
+void wait(){
+
+char c;
+
+cout << "Press any key to continue"<< endl;
+cin >> c;
+}
 
 

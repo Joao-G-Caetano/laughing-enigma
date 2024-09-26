@@ -14,7 +14,7 @@ short stackEmpty(Stack *stackTop){
 }
 
 
-Board *stackPop(Stack **stackTop){
+Board *stackPopDelete(Stack **stackTop){
 
     Stack *aux=*stackTop;
     Board *popedBoard;
@@ -22,6 +22,17 @@ Board *stackPop(Stack **stackTop){
     popedBoard=(aux)->board;
     *stackTop=(*stackTop)->next;
     free(aux);
+    return popedBoard;
+}
+
+
+Board *stackPop(Stack **stackTop){
+
+  
+    Board *popedBoard;
+
+    popedBoard=(*stackTop)->board;
+    *stackTop=(*stackTop)->next;
     return popedBoard;
 }
 
@@ -56,8 +67,6 @@ void stackPrint(Stack *stackTop){
 
     while(stackTop!=NULL){
 
-        cout << "Level -> "<< stackTop->board->level<< endl;
-        cout << "playerID -> "<< stackTop->board->playerID << endl;
         displayBoard(stackTop->board);
         stackTop=stackTop->next;
 

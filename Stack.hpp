@@ -13,6 +13,8 @@ void stackInit(Board **fatherBoard, Stack **stackTop);
 
 Board *stackPop(Stack **stackTop);
 
+Board *stackPopDelete(Stack **stackTop);
+
 void stackPush(Stack **stackTop, Board *newBoard);
 
 void stackPrint(Stack *stackTop);
